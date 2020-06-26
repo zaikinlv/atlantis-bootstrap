@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1beta1
+kind: Certificate
+metadata:
+  name: ingress-certificate
+  namespace: default
+spec:
+  secretName: atlantis-ingress-certs
+  commonName: 'atlantis-test.example.com'
+  issuerRef:
+    name: letsencrypt-test
+    kind: Issuer
+  dnsNames:
+  - atlantis-test.example.com

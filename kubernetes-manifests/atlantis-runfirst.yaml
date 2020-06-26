@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: atlantis
+  labels:
+    app: atlantis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: atlantis
+  template:
+    metadata:
+      labels:
+        app: atlantis
+    spec:
+      containers:
+      - name: atlantis
+        image: runatlantis/atlantis:v0.15.0  # 1. Replace <VERSION> with the most recent release.
+        env:
+        - name: ATLANTIS_REPO_WHITELIST
+          value: github.com/<github organization>/<repo name> # 2. Replace this with your own repo whitelist. https://www.runatlantis.io/docs/server-configuration.html#flags
+
+        ### GitHub Config ###
+        - name: ATLANTIS_GH_USER
+          value: fake
+        - name: ATLANTIS_GH_TOKEN
+          value: fake
+        ### End GitHub Config ###
+
+        - name: ATLANTIS_PORT
+          value: "4141" # Kubernetes sets an ATLANTIS_PORT variable so we need to override.
+        - name: ATLANTIS_ATLANTIS_URL
+          value: https://atlantis-test.example.com # 3. Update according to your configuration
+        ports:
+        - name: atlantis
+          containerPort: 4141
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 100m
+        livenessProbe:
+          # We only need to check every 60s since Atlantis is not a
+          # high-throughput service.
+          periodSeconds: 60
+          httpGet:
+            path: /healthz
+            port: 4141
+            # If using https, change this to HTTPS
+            scheme: HTTP
+        readinessProbe:
+          periodSeconds: 60
+          httpGet:
+            path: /healthz
+            port: 4141
+            # If using https, change this to HTTPS
+            scheme: HTTP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlantis
+spec:
+  type: NodePort
+  ports:
+  - name: atlantis
+    port: 80
+    targetPort: 4141
+  selector:
+    app: atlantis

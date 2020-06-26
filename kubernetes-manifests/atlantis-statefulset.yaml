@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: atlantis
+spec:
+  serviceName: atlantis
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
+  selector:
+    matchLabels:
+      app: atlantis
+  template:
+    metadata:
+      labels:
+        app: atlantis
+    spec:
+      serviceAccountName: atlantis
+      securityContext:
+        fsGroup: 1000 # Atlantis group (1000) read/write access to volumes.
+      volumes:
+      - name: secret-volume
+        secret:
+          secretName: atlantis
+          items:
+          - key: gh-key-file
+            path: atlantis-app-key.pem
+      containers:
+      - name: atlantis
+        image: runatlantis/atlantis:v0.15.0 # 1. Replace <VERSION> with the most recent release.
+        env:
+        - name: ATLANTIS_REPO_WHITELIST
+          value: github.com/<github organization>/<repo name> # 2. Replace this with your own repo whitelist. https://www.runatlantis.io/docs/server-configuration.html#flags
+
+        ### GitHub Config ###
+        - name: ATLANTIS_GH_APP_ID
+          value: "<app_id>" # 3. Update to your Atlantis Github App ID
+        - name: ATLANTIS_GH_APP_KEY_FILE
+          value: "/secret/atlantis-app-key.pem"
+        - name: ATLANTIS_GH_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: atlantis
+              key: gh-webhook-secret
+        - name: ATLANTIS_WRITE_GIT_CREDS
+          value: "true"
+        ### End GitHub Config ###
+
+        - name: ATLANTIS_DATA_DIR
+          value: /atlantis
+        - name: ATLANTIS_PORT
+          value: "4141" # Kubernetes sets an ATLANTIS_PORT variable so we need to override.
+        - name: ATLANTIS_ATLANTIS_URL
+          value: https://atlantis-test.example.com  # 4. Update according to your configuration
+        volumeMounts:
+        - name: atlantis-data
+          mountPath: /atlantis
+        - name: secret-volume
+          readOnly: true
+          mountPath: /secret
+        ports:
+        - name: atlantis
+          containerPort: 4141
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+          limits:
+            memory: 256Mi
+            cpu: 100m
+        livenessProbe:
+          # We only need to check every 60s since Atlantis is not a
+          # high-throughput service.
+          periodSeconds: 60
+          httpGet:
+            path: /healthz
+            port: 4141
+            # If using https, change this to HTTPS
+            scheme: HTTP
+        readinessProbe:
+          periodSeconds: 60
+          httpGet:
+            path: /healthz
+            port: 4141
+            # If using https, change this to HTTPS
+            scheme: HTTP
+  volumeClaimTemplates:
+  - metadata:
+      name: atlantis-data
+    spec:
+      accessModes: ["ReadWriteOnce"] # Volume should not be shared by multiple nodes.
+      resources:
+        requests:
+          # The biggest thing Atlantis stores is the Git repo when it checks it out.
+          # It deletes the repo after the pull request is merged.
+          storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: atlantis
+spec:
+  type: NodePort
+  ports:
+  - name: atlantis
+    port: 80
+    targetPort: 4141
+  selector:
+    app: atlantis
