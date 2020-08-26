@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1beta1
+kind: Issuer
+metadata:
+  name: letsencrypt-test
+  namespace: default
+spec:
+  acme:
+    # Server url is important and defines whether staging or production ACME environment is used
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # Setup email that will receive events related to certificate renewal
+    email: cert@ssbmod.net
+    privateKeySecretRef:
+      name: letsencrypt-test
+    solvers:
+      - selector: {}
+        dns01:
+          azureDNS:
+            # Service principal clientId (also called appId)
+            clientID: <client_id>
+            # A secretKeyRef to a service principal ClientSecret (password)
+            # ref: https://docs.microsoft.com/en-us/azure/container-service/kubernetes/container-service-kubernetes-service-principal
+            clientSecretSecretRef:
+              name: azure
+              key: azure_client_secret
+            # Azure subscription Id
+            subscriptionID: <subscription_id>
+            # Azure AD tenant Id
+            tenantID: <tenant_id>
+            # ResourceGroup name where dns zone is provisioned
+            resourceGroupName: <group_name>
+            hostedZoneName: example.com
+            # Azure Cloud Environment, default to AzurePublicCloud
+            #environment: AZURE_ENVIRONMENT
