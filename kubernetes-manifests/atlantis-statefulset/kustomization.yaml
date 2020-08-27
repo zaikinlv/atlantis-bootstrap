@@ -3,5 +3,3 @@ kind: Kustomization
 resources:
 - ingress.yaml
 - atlantis-statefulset.yaml
-- cert-manager.yaml
-- certificate.yaml
