@@ -12,8 +12,7 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-test
     solvers:
-      - selector: {}
-        dns01:
+      - dns01:
           azureDNS:
             # Service principal clientId (also called appId)
             clientID: <client_id>
