@@ -30,6 +30,3 @@ override.tf.json
 
 # Exclude JetBrains IDE local folder
 .idea/
-
-# Exclude Azure authentication variables
-azure.tfvars
