@@ -5,3 +5,7 @@ bases:
 patchesStrategicMerge:
 - cert-manager.yaml
 - certificate.yaml
+secretGenerator:
+- name: azure
+  files:
+  - azure_client_secret

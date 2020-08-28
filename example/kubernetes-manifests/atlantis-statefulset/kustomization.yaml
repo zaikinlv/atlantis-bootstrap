@@ -5,3 +5,8 @@ bases:
 patchesStrategicMerge:
 - ingress.yaml
 - atlantis-statefulset.yaml
+secretGenerator:
+- name: atlantis
+  files:
+  - gh-webhook-secret
+  - gh-key-file

@@ -17,31 +17,6 @@ module "kubernetes-engine_workload-identity" {
 }
 
 
-#---------------------------#
-# Create Kubernetes secrets #
-#---------------------------#
-resource "kubernetes_secret" "azure" {
-  metadata {
-    name = "azure"
-  }
-  data = {
-    azure_client_secret   = var.azure_client_secret
-  }
-}
-
-resource "kubernetes_secret" "atlantis" {
-  count = var.create_secret ? 1 : 0
-  
-  metadata {
-    name = "atlantis"
-  }
-  data = {
-    gh-webhook-secret   = var.gh-webhook-secret
-    gh-key-file         = var.gh-key-file
-  }
-}
-
-
 #--------------------------------------------------------#
 # Create Cloud Armor Security Policy to protect Atlantis #
 #--------------------------------------------------------#

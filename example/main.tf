@@ -19,10 +19,7 @@ module "atlantis-test" {
     },
   ]
   azure_client_secret   = var.azure_client_secret
-  gh-key-file           = var.gh-key-file
   azure_subscription_id = var.azure_subscription_id
   azure_tenant_id       = var.azure_tenant_id
-  gh-webhook-secret     = var.gh-webhook-secret
   azure_client_id       = var.azure_client_id
-  create_secret         = false
 }

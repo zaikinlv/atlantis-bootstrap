@@ -17,24 +17,26 @@ Go to https://console.developers.google.com/apis/api/container.googleapis.com/ov
 ### Create base infrastructure
 - Start to create a service account key (credfile) which will be used to run Terraform commands. Follow the instructions at https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys. The service account to use is the one who starts with "project-factory" in the seed-project.
 
-- Create a new repository/local folder which will contain your configuration files using the 'example' folder as a template. 
+- Create a new repository/local folder which will contain your configuration files using the `example` folder as a template.
 
 - Update the variable values in `main.tf`
 
 - Update the values in the `backend.tf` file to reflect the location of your Terraform state file.
 
-- Update the values in `azure.tfvars`. This file is used to authenticate to Azure for DNS and Github for Atlantis-Github integration. The values for *gh-webhook-secret* and *gh-key-file* will be filled in later.
-
-Update the files under `kubernetes-manifests` as outlined.
+- Update the values in `azure.tfvars`. This file is used to authenticate to Azure for DNS.
 
 - Run terraform from the path where `main.tf` is located
 ```bash
+# Run Terraform init first:
+$ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform init
+
 # Terraform plan to to check the execution plan
 $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform plan -var-file=azure.tfvars
 
 # Terraform to apply the changes
 $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform apply -var-file=azure.tfvars
 ```
+- Update the files under `kubernetes-manifests/cert-manager` and `kubernetes-manifests/runfirst` as outlined.
 
 ### Install applications
 ```bash
@@ -54,21 +56,16 @@ $ kubectl apply -k kubernetes-manifests/runfirst
 Visit this URL https://$ATLANTIS_HOST/github-app/setup and follow the instructions here https://www.runatlantis.io/docs/access-credentials.html#generating-an-access-token
 
 On the "Github app created successfully" page you will see the gh-app-id, gh-app-key-file and gh-webhook-secret.
-Update the `kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml` with the new gh-app-id and the `azure.tfvars` with the `gh-webhook-secret` and `gh-app-key-file`.   
+Update the `kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml` with the new gh-app-id and the other outlined variables.   
+The files `kubernetes-manifests/atlantis-statefulset/gh-webhook-secret` and `kubernetes-manifests/atlantis-statefulset/gh-key-file` also needs to be updated to reflect gh-app-key-file and gh-webhook-secret from the step above.   
 **Note!** It is important that the *gh-key-file* is kept with this specific format.   
-Set the variable *create_secret* in `azure.tfvars` to *true*.   
 **WARNING - Only a single Atlantis installation per GitHub App is supported at the moment**
 
 ```bash
-# In order to create kubernetes secrets of gh-app-key-file and gh-webhook-secret, run terraform again.
-$ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform plan -var-file=azure.tfvars
-$ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform apply -var-file=azure.tfvars
-
 # Delete the "runfirst" deployment
 $ kubectl delete -k kubernetes-manifests/runfirst
 ```
 # Deploy Atlantis
-- Prior to applying the `kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml`, update *ATLANTIS_GH_APP_ID* as outlined in the file.
 ```bash
 $ kubectl apply -k kubernetes-manifests/atlantis-statefulset
 ```
