@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.global-static-ip-name: atlantis-external-facing-ip
+  name: atlantis-test-ingress
+  namespace: default
+spec:
+  rules:
+  - host: atlantis-test.example.com # Update me
+    http:
+      paths:
+      - backend:
+          serviceName: atlantis
+          servicePort: 80
