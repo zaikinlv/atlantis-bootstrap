@@ -55,7 +55,7 @@ variable "azure_tenant_id" {
 }
 
 
-# GKE spacific svariables
+# GKE specific variables
 
 variable "master_authorized_networks" {
   type = list(object({
@@ -76,22 +76,4 @@ variable "zone_name" {
 variable "resource_group" {
   type        = string
   description = "Azure resource group name"
-}
-
-# Atlantis Github variables
-
-variable "create_secret" {
-  type        = string
-  default     = false
-  description = "Used to trigger creation of gh-atlantis secrets"
-}
-
-variable "gh-webhook-secret" {
-  type        = string
-  description = "Github Webhook secret"
-}
-
-variable "gh-key-file" {
-  type        = string
-  description = "Github App key"
 }

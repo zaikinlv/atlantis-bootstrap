@@ -75,9 +75,5 @@ module atlantis {
 
   project_id                 = module.gcp.project_id
   cluster_name               = module.gke.name
-  azure_client_secret        = var.azure_client_secret
-  create_secret              = var.create_secret
-  gh-webhook-secret          = var.gh-webhook-secret
-  gh-key-file                = var.gh-key-file
   master_authorized_networks = var.master_authorized_networks
 }

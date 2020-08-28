@@ -18,15 +18,3 @@ variable "azure_tenant_id" {
   type        = string
   description = "Azure tenant ID"
 }
-
-# Atlantis Github variables
-
-variable "gh-webhook-secret" {
-  type        = string
-  description = "Github Webhook secret"
-}
-
-variable "gh-key-file" {
-  type        = string
-  description = "Github App key"
-}
