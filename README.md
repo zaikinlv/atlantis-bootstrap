@@ -45,10 +45,10 @@ $ gcloud container clusters get-credentials <CLUSTER NAME>  --project <PROJECT I
 $ kubectl apply  -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml # Check for latest version
 
 # Create TLS certificate
-$ kubectl apply  -k kubernetes-manifestscert-manager/cert-manager/*
+$ kubectl apply  -k kubernetes-manifestscert-manager/cert-manager
 
 # Deploy Atlantis (temporary runfirst config to create Github app)
-$ kubectl apply -k kubernetes-manifests/runfirst/*
+$ kubectl apply -k kubernetes-manifests/runfirst
 ```
 #### Create a Github App
 Visit this URL https://$ATLANTIS_HOST/github-app/setup and follow the instructions here https://www.runatlantis.io/docs/access-credentials.html#generating-an-access-token
@@ -65,12 +65,12 @@ $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform plan -var-file=azu
 $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform apply -var-file=azure.tfvars
 
 # Delete the "runfirst" deployment
-$ kubectl delete -k kubernetes-manifests/runfirst/*
+$ kubectl delete -k kubernetes-manifests/runfirst
 ```
 # Deploy Atlantis
 - Prior to applying the `kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml`, update *ATLANTIS_GH_APP_ID* as outlined in the file.
 ```bash
-$ kubectl apply -k kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml
+$ kubectl apply -k kubernetes-manifests/atlantis-statefulset
 ```
 ### Secure Atlantis with Cloud Armor
 Note! If a Kubernetes Ingress resource is deleted and then recreated, the security policy must be reapplied to the new backend service or services.
