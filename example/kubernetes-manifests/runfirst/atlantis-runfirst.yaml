@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: atlantis
+  name: atlantis
+spec:
+  template:
+    spec:
+      $setElementOrder/containers:
+      - name: atlantis
+      containers:
+      - $setElementOrder/env:
+        - name: ATLANTIS_REPO_WHITELIST
+        - name: ATLANTIS_GH_USER
+        - name: ATLANTIS_GH_TOKEN
+        - name: ATLANTIS_PORT
+        - name: ATLANTIS_ATLANTIS_URL
+        env:
+        - name: ATLANTIS_REPO_WHITELIST
+          value: github.com/org/repo # Update me
+        - name: ATLANTIS_ATLANTIS_URL
+          value: https://atlantis-test.example.com # Update me
+        image: runatlantis/atlantis:v0.15.0 # update me
+        name: atlantis

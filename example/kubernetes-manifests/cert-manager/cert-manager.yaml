@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1beta1
+kind: Issuer
+metadata:
+  name: letsencrypt-test
+  namespace: default
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: mail@example.com # Update me
+    solvers:
+      - dns01:
+          azureDNS:
+            clientID: 11111111-2222-3333-4444-555555555555 # Update me
+            subscriptionID: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee # Update me
+            tenantID: 12345678-1234-1234-1234-123456789012 # Update me
+            resourceGroupName: rg_dns # Update me
+            hostedZoneName: example.com # Update me
