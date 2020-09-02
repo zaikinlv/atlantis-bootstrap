@@ -65,6 +65,18 @@ variable "master_authorized_networks" {
   description = "The list of CIDR blocks of master authorized networks"
 }
 
+variable "region" {
+  type        = string
+  default     = "europe-north1"
+  description = "Region in which to create the cluster and run Atlantis."
+}
+
+variable "zone" {
+  type        = string
+  default     = "europe-north1-a"
+  description = "GCP zone in which to create the cluster and run Atlantis"
+}
+
 
 # Ingress variables
 
