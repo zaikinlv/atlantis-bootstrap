@@ -37,13 +37,6 @@ module "vpc" {
 }
 
 
-resource "time_sleep" "wait_10_seconds" {
-  depends_on = [module.vpc]
-
-  create_duration = "10s"
-}
-
-
 #------------------#
 # Create Cloud NAT #
 #------------------#
@@ -63,8 +56,6 @@ module "cloud-nat" {
 # Create a private Kubernetes cluster #
 #-------------------------------------#
 module "private-cluster" {
-  depends_on = [time_sleep.wait_10_seconds]
-
   source                             = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
   version                            = "~> 11.0"
 
