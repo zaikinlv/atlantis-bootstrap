@@ -7,7 +7,7 @@ spec:
   secretName: atlantis-ingress-certs
   commonName: 'atlantis-test.example.com' # Update me
   issuerRef:
-    name: letsencrypt-test
+    name: letsencrypt
     kind: Issuer
   dnsNames:
   - atlantis-test.example.com # Update me

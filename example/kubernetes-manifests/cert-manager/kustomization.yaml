@@ -9,3 +9,5 @@ secretGenerator:
 - name: azure
   files:
   - azure_client_secret
+generatorOptions:
+  disableNameSuffixHash: true

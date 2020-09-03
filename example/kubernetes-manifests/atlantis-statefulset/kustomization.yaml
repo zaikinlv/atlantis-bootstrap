@@ -10,3 +10,5 @@ secretGenerator:
   files:
   - gh-webhook-secret
   - gh-key-file
+generatorOptions:
+  disableNameSuffixHash: true

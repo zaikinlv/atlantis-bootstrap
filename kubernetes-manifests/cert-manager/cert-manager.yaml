@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1beta1
 kind: Issuer
 metadata:
-  name: letsencrypt-test
+  name: letsencrypt
   namespace: default
 spec:
   acme:
@@ -10,7 +10,7 @@ spec:
     # Setup email that will receive events related to certificate renewal
     email: cert@example.com
     privateKeySecretRef:
-      name: letsencrypt-test
+      name: letsencrypt
     solvers:
       - dns01:
           azureDNS:

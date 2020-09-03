@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1beta1
 kind: Issuer
 metadata:
-  name: letsencrypt-test
+  name: letsencrypt
   namespace: default
 spec:
   acme:
@@ -11,6 +11,9 @@ spec:
       - dns01:
           azureDNS:
             clientID: 11111111-2222-3333-4444-555555555555 # Update me
+            clientSecretSecretRef:
+              name: azure
+              key: azure_client_secret
             subscriptionID: aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee # Update me
             tenantID: 12345678-1234-1234-1234-123456789012 # Update me
             resourceGroupName: rg_dns # Update me
