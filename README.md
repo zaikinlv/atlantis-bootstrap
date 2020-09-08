@@ -2,7 +2,7 @@
 
 ## Terraform compability
 
-This module is meant for use with Terraform 0.12.
+This module is meant for use with Terraform 0.13.
 
 ## Usage
 
