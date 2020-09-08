@@ -41,13 +41,16 @@ $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform apply -var-file=az
 ### Install applications
 ```bash
 # Set up gcloud
+$ gcloud init # select "Create a new configuration" and follow on screen guidance to set up gcloud against the newly created atlantis-project.
+
+# Update kubeconfig file with appropriate credentials and endpoint information to point kubectl at the newly created kubernetes cluster.
 $ gcloud container clusters get-credentials <CLUSTER NAME>  --project <PROJECT ID> --region europe-north1
 
 # Install cert-manager
 $ kubectl apply  -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml # Check for latest version
 
 # Create TLS certificate
-$ kubectl apply  -k kubernetes-manifestscert-manager/cert-manager
+$ kubectl apply  -k kubernetes-manifests/cert-manager
 
 # Deploy Atlantis (temporary runfirst config to create Github app)
 $ kubectl apply -k kubernetes-manifests/runfirst

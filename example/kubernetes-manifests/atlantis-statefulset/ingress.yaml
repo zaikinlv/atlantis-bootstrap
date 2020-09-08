@@ -4,7 +4,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.allow-http: "false"
     kubernetes.io/ingress.global-static-ip-name: atlantis-external-facing-ip
-  name: atlantis-test-ingress
+  name: atlantis-ingress
   namespace: default
 spec:
   rules:
