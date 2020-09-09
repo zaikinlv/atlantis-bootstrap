@@ -17,6 +17,7 @@ spec:
         - name: ATLANTIS_DATA_DIR
         - name: ATLANTIS_PORT
         - name: ATLANTIS_ATLANTIS_URL
+        - name: ATLANTIS_REPO_CONFIG_JSON
         env:
         - name: ATLANTIS_REPO_WHITELIST
           value: github.com/org/repo # Update me
