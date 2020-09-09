@@ -54,6 +54,8 @@ spec:
           value: "4141" # Kubernetes sets an ATLANTIS_PORT variable so we need to override.
         - name: ATLANTIS_ATLANTIS_URL
           value: https://atlantis-test.example.com  # 4. Update according to your configuration
+        - name: ATLANTIS_REPO_CONFIG_JSON
+          value: '{"repos":[{"id":"/.*/", "apply_requirements":["approved"]}]}'
         volumeMounts:
         - name: atlantis-data
           mountPath: /atlantis
