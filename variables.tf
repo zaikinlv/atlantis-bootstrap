@@ -30,7 +30,7 @@ variable "folder_id" {
 variable "project_id_prefix" {
   type        = string
   default     = ""
-  description = "Project prefix ID of the Atlantis project."
+  description = "Project prefix ID of the Atlantis project. Also used as cluster name"
 }
 
 # Azure variables

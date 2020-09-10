@@ -1,142 +1,225 @@
 # Atlantis bootstrap
 
+## Purpose
+
+This Terraform-module, Kustomize templates and installation guide will help you create an [Atlantis](https://www.runatlantis.io) setup running on GKE. Infrastructure and services that will be created and configured are:
+
+* A GCP-project
+* A GKE-cluster running in the project
+* Cert-manager running in the cluster
+* Atlantis running in the cluster
+* All needed certificates, keys and secrets
+* Cloud Armor for securing the applications
+* GitHub App which connects Atlantis to one or more repositories containing Terraform config
+
+When this setup is completed you should be able to control your infrastructure on GCP using the Atlantis installation.
+
+## Prerequisites
+
+* `gcloud`, `kubectl` and `terraform` installed on your machine
+* An `organisation` on GCP
+* A `seed project` (installation guide below)
+* `Azure DNS` to handle DNS A record creation and DNS-01 challenge for certificate issuance.
+* A `GitHub organisation` or account (Any VCS should work but this guide uses GitHub)
+* A `config-repository` to store the config you create when following this guide
+* Somewhere to `store the Terraform state`. This could be a storage bucket of some kind for remote state, or a local folder if you just want to use local state. Remote state is preferred
+
+## Versioning
+
+To avoid breaking changes you should always use a specific release version of this repository in your configuration. The three files specifying versions in your config repo are (see the `example directory`):
+
+* `main.tf`
+* `kubernetes-manifests/runfirst/kustomization.yaml`
+* `kubernetes-manifests/atlantis-statefulset/kustomization.yaml`
+
 ## Terraform compability
 
 This module is meant for use with Terraform 0.13.
 
 ## Usage
 
-The bootstrapping consist of three parts. The first part uses Terraform to create the base infrastructure. The second part uses kubectl to install applications (cert-manager and Atlantis) in Kubernetes. And part three secures the application.
+The bootstrapping consists of four parts. The first part uses Terraform to create the base infrastructure for the later Atlantis installation. The second part uses kubectl to install applications (cert-manager and Atlantis) in Kubernetes. Part three creates a GitHub app which Atlantis uses to connect to repositories containing Terraform-code. Part four secures access to the Atlantis application.
 
 The installation requires that a seed project is already created using the [helper script](https://github.com/terraform-google-modules/terraform-google-project-factory/blob/master/helpers/setup-sa.sh) from [Google Cloud Project Factory Terraform Module](https://github.com/terraform-google-modules/terraform-google-project-factory).
 
 ### Prepare the seed project
 
-Go to https://console.developers.google.com/apis/api/container.googleapis.com/overview?project=<seed_project_id> and enable the Kubernetes Engine API if not enabled. This is needed to create the Kubernetes cluster. If not enabled it will fail to get available Kubernetes cluster versions.
+Go to `https://console.developers.google.com/apis/api/container.googleapis.com/overview?project=<seed_project_id>` and enable the Kubernetes Engine API if not enabled. This is needed to create the Kubernetes cluster. If not enabled the setup will fail.
 
 ### Create base infrastructure
-- Start to create a service account key (credfile) which will be used to run Terraform commands. Follow the instructions at https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys. The service account to use is the one who starts with "project-factory" in the seed-project.
 
-- Create a new repository/local folder which will contain your configuration files using the `example` folder as a template.
+* Start by creating a service account key (credfile) which will be used when running Terraform commands. Follow [these instructions](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys). The service account to use is the one who starts with "project-factory" in the seed project. Store the JSON-file on your local machine. You need to have the role "service account key admin" on GCP to create the key.
 
-- Update the variable values in `main.tf`
+* Create a new repository / local folder which will contain your configuration files. Copy all files and directories in the `example` folder to the new repo/folder.
 
-- Update the values in the `backend.tf` file to reflect the location of your Terraform state file.
+* IMPORTANT! Rename the file `rename_to_gitignore.txt` to `.gitignore`. This will prevent files with secrets getting committed to Git. These files should be stored in a secure location.
 
-- Update the values in `azure.tfvars`. This file is used to authenticate to Azure for DNS.
+* Update the variable values in `main.tf`.
 
-- Run terraform from the path where `main.tf` is located
-```bash
-# Run Terraform init first:
-$ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform init
+* Update the values in the `backend.tf` file to reflect the location of your Terraform state file.
 
-# Terraform plan to to check the execution plan
-$ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform plan -var-file=azure.tfvars
+* Update the values in `azure.tfvars`. This file is used to authenticate to Azure for DNS.
 
-# Terraform to apply the changes
-$ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform apply -var-file=azure.tfvars
-```
-- Update the files under `kubernetes-manifests/cert-manager` and `kubernetes-manifests/runfirst` as outlined.
+* Run terraform from the path where `main.tf` is located.
+
+    ```bash
+    # Run Terraform init first:
+    $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform init
+
+    # Terraform plan to to check the execution plan
+    $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform plan -var-file=azure.tfvars
+
+    # Terraform to apply the changes
+    $ GOOGLE_APPLICATION_CREDENTIALS=/path/to/credfile/ terraform apply -var-file=azure.tfvars
+    ```
+
+    (If `terraform apply` fails with `Error: googleapi: Error 400: Subnetwork.....is not valid for Network ...., badRequest`; you should run `terraform apply` again)
+
+* Update the files under `kubernetes-manifests/cert-manager` and `kubernetes-manifests/runfirst` as outlined in each file:
+
+  * kubernetes-manifests/cert-manager/cert-manager.yaml
+  * kubernetes-manifests/cert-manager/certificate.yaml
+  * kubernetes-manifests/runfirst/atlantis-runfirst.yaml
+  * kubernetes-manifests/runfirst/ingress.yaml
+
+**Note!** The URL to the Letsencrypt server in `cert-manager.yaml` is `https://acme-staging-v02.api.letsencrypt.org/directory` in the example-directory. This should be changed to `https://acme-v02.api.letsencrypt.org/directory` if creating a production setup.
 
 ### Install applications
+
+You should now have a project with a Kubernetes cluster running in GCP. Now it's time to install cert-manager, certificates and a temporary Atlantis setup. Use the following commands to achieve this. Project ID, cluster name, zone and region can be found in the Google Console, if these are not overridden in your config.
+
 ```bash
-# Set up gcloud
-$ gcloud init # select "Create a new configuration" and follow on screen guidance to set up gcloud against the newly created atlantis-project.
+# Set up gcloud. Select "Create a new configuration" and follow on screen guidance to set up gcloud against the newly created atlantis-project
+$ gcloud init
 
-# Update kubeconfig file with appropriate credentials and endpoint information to point kubectl at the newly created kubernetes cluster.
-$ gcloud container clusters get-credentials <CLUSTER NAME>  --project <PROJECT ID> --region europe-north1
+# Update kubeconfig file with appropriate credentials and endpoint information to point kubectl at the newly created kubernetes cluster
+$ gcloud container clusters get-credentials <CLUSTER NAME> --project <PROJECT ID> --region <REGION>
 
-# Install cert-manager
-$ kubectl apply  -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml # Check for latest version
+# Install cert-manager. Check for latest version
+$ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml
 
 # Create TLS certificate
-$ kubectl apply  -k kubernetes-manifests/cert-manager
+$ kubectl apply -k kubernetes-manifests/cert-manager
 
-# Deploy Atlantis (temporary runfirst config to create Github app)
+# Deploy Atlantis (temporary runfirst config to create Github app. This will be removed in a later stage)
 $ kubectl apply -k kubernetes-manifests/runfirst
 ```
-#### Create a Github App
-Visit this URL https://$ATLANTIS_HOST/github-app/setup and follow the instructions here https://www.runatlantis.io/docs/access-credentials.html#generating-an-access-token
 
-On the "Github app created successfully" page you will see the gh-app-id, gh-app-key-file and gh-webhook-secret.
-Update the `kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml` with the new gh-app-id and the other outlined variables.   
-The files `kubernetes-manifests/atlantis-statefulset/gh-webhook-secret` and `kubernetes-manifests/atlantis-statefulset/gh-key-file` also needs to be updated to reflect gh-app-key-file and gh-webhook-secret from the step above.   
-**Note!** It is important that the *gh-key-file* is kept with this specific format.   
-**WARNING - Only a single Atlantis installation per GitHub App is supported at the moment**
+It will take some time before the `kubernetes ingress` for the Atlantis app is ready.
+
+### Create a GitHub App
+
+After the ingress is in a ready state visit your Atlantis-installation at `https://<ATLANTIS_HOST>/github-app/setup` and create an access token following these [instructions](https://www.runatlantis.io/docs/access-credentials.html#github-app). Since your temporary Atlantis deployment is already running, ignore the steps regarding starting and stopping Atlantis.
+
+On the "Github app created successfully" page you will see the `gh-app-id`, `gh-app-key-file` and `gh-webhook-secret`.
+
+Update the files `kubernetes-manifests/atlantis-statefulset/atlantis-statefulset.yaml`
+and `kubernetes-manifests/atlantis-statefulset/ingress.yaml` with the new `gh-app-id` and the other outlined variables.
+
+The files `kubernetes-manifests/atlantis-statefulset/gh-webhook-secret` and `kubernetes-manifests/atlantis-statefulset/gh-key-file` also need to be updated to reflect `gh-app-key-file` and `gh-webhook-secret` from the step above.
+
+**Note!** It is important that the `gh-key-file` is kept with this specific format.
+
+**Note!** This guide installs the Atlantis GitHub App in your personal account on GitHub. If you are setting up Atlantis for an organisation, the ownership of this app must be transferred to the organisation. Follow the [GitHub guide](https://developer.github.com/apps/managing-github-apps/transferring-ownership-of-a-github-app/) to move the ownership of the app.
+
+**WARNING!** Only a single Atlantis installation per GitHub App is supported at the moment. This means that if you need a "test-installation" of Atlantis running, it must have its own GitHub App.
+
+Now that the GitHub App is set up, it's time to delete the temporary Atlantis deployment.
 
 ```bash
 # Delete the "runfirst" deployment
 $ kubectl delete -k kubernetes-manifests/runfirst
 ```
-# Deploy Atlantis
+
+## Deploy Atlantis
+
 ```bash
+# Deploy Atlantis with the configuration gathered in the previous step.
 $ kubectl apply -k kubernetes-manifests/atlantis-statefulset
 ```
-### Secure Atlantis with Cloud Armor
-Note! If a Kubernetes Ingress resource is deleted and then recreated, the security policy must be reapplied to the new backend service or services.
-```bash
-$ gcloud compute backend-services list
 
-# Run *describe* on the backends:
+### Secure Atlantis with Cloud Armor
+
+This is achieved by applying the `atlantis-policy` security policy defined in `modules/atlantis/atlantis.tf` to the default Atlantis backend-service. This security policy limits the access to the Atlantis service. The only allowed access is from the GitHub App, and the IPs defined in `master_authorized_networks` in your configuration. The latter is typically the IP to your machine.
+
+There are two backend-services, but the security policy should only be used for the service `default/atlantis`. `gcloud compute backend-services list` lists the name of the backend-services. To figure out which is the right one, run `describe` on each of the backends:
+
+```bash
+# Describe the backend service
 $ gcloud compute backend-services describe <NAME> --global
 ```
- There are two backend-services, but only one should be attached to the security policy. In order to find the correct name of the security policy for the "update" command, check for the following content in the output of the above command:   
- `description: '{"kubernetes.io/service-name":"default/atlantis","kubernetes.io/service-port":"80"}'`
+
+The backend-service to use has the following content in the output of the above command:
+`description: '{"kubernetes.io/service-name":"default/atlantis","kubernetes.io/service-port":"80"}'`.
+After having identified the correct backend-service, use its name in the command below:
 
 ```bash
-# After having identified the correct backend-service, use it's name in the command below:
+# Apply the security policy
 $ gcloud compute backend-services update <NAME> --security-policy atlantis-policy --global
 
 # i.e. `gcloud compute backend-services update k8s-be-32687--56e780489a9d9de0 --security-policy atlantis-policy --global`
 ```
 
+**WARNING!** If a Kubernetes Ingress resource is deleted and then recreated, the security policy must be reapplied to the new backend service or services.
+
 ## Terraform modules used by this module
 
-[project-factory](https://registry.terraform.io/modules/terraform-google-modules/project-factory)   
-[kubernetes-engine](https://registry.terraform.io/modules/terraform-google-modules/kubernetes-engine/google/)
-[address](ttps://registry.terraform.io/modules/terraform-google-modules/address/google/)
-[network](https://registry.terraform.io/modules/terraform-google-modules/network/google/)
-[cloud-nat](ttps://registry.terraform.io/modules/terraform-google-modules/cloud-nat/google/)
+* [project-factory](https://registry.terraform.io/modules/terraform-google-modules/project-factory)
+* [kubernetes-engine](https://registry.terraform.io/modules/terraform-google-modules/kubernetes-engine/google/)
+* [address](ttps://registry.terraform.io/modules/terraform-google-modules/address/google/)
+* [network](https://registry.terraform.io/modules/terraform-google-modules/network/google/)
+* [cloud-nat](ttps://registry.terraform.io/modules/terraform-google-modules/cloud-nat/google/)
+
+## Contributing
+
+We welcome contributions to this setup! Please fork the repo, create a PR and we'll have a look at it. Please remember that changes to this setup should be reflected in the `example` directory and this README.
+
+## Generated documentation
+
+These docs are generated with [terraform-docs](<https://github.com/terraform-docs/terraform-docs>):
+
+```bash
+terraform-docs markdown . --indent 3
+```
 
 <!-- BEGINNING OF AUTO-GENERATED DOCS USING terraform-docs -->
-## Requirements
+### Requirements
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12 |
+| terraform | >= 0.13 |
 | azurerm | ~> 2.21.0 |
 | github | 2.9.2 |
 | google | ~> 3.27.0 |
 
-## Providers
+### Providers
 
-No provider.
+| Name | Version |
+|------|---------|
+| google | ~> 3.27.0 |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| activate\_apis | The list of apis to activate within the project | `list(string)` | <pre>[<br>  "container.googleapis.com",<br>  "iam.googleapis.com",<br>  "admin.googleapis.com",<br>  "compute.googleapis.com",<br>  "secretmanager.googleapis.com",<br>  "iap.googleapis.com"<br>]</pre> | no |
+| azure\_client\_id | Azure client ID | `string` | n/a | yes |
+| azure\_client\_secret | Azure client secret | `string` | n/a | yes |
+| azure\_subscription\_id | Azure subscription ID | `string` | n/a | yes |
+| azure\_tenant\_id | Azure tenant ID | `string` | n/a | yes |
 | billing\_account | Billing account ID | `string` | n/a | yes |
 | folder\_id | The ID of a folder to host this project | `string` | `""` | no |
 | labels | Labels to use on the project | `map(string)` | `{}` | no |
+| master\_authorized\_networks | The list of CIDR blocks of master authorized networks | <pre>list(object({<br>    cidr_block   = string<br>    display_name = string<br>  }))</pre> | n/a | yes |
 | org\_id | Google organization ID | `string` | `""` | no |
 | project\_id\_prefix | Project prefix ID of the Atlantis project. | `string` | `""` | no |
 | project\_name | The name of the GCP project created for Atlantis resources | `string` | n/a | yes |
-| skip\_gcloud\_download | Whether to skip downloading gcloud (assumes gcloud is already available outside the module) | `bool` | `true` | no |
-| azure\_client\_secret | Azure client secret | `string` | n/a | yes |
-| cluster\_name | Cluster name of the Kubernetes cluster | `string` | `""` | no |
-| create\_secret | Used to trigger creation of gh-atlantis secrets | `string` | `false` | no |
-| gh-key-file | Github App key | `string` | n/a | yes |
-| gh-webhook-secret | Github Webhook secret | `string` | n/a | yes |
-| master\_authorized\_networks | The list of CIDR blocks of master authorized networks | <pre>list(object({<br>    cidr_block   = string<br>    display_name = string<br>  }))</pre> | n/a | yes |
-| project\_id | Project ID of the Atlantis project. | `string` | `""` | no |
 | region | Region in which to create the cluster and run Atlantis. | `string` | `"europe-north1"` | no |
+| resource\_group | Azure resource group name | `string` | n/a | yes |
 | zone | GCP zone in which to create the cluster and run Atlantis | `string` | `"europe-north1-a"` | no |
 | zone\_name | DNS zone name | `string` | n/a | yes |
-| resource\_group | Azure resource group name | `string` | n/a | yes |
 
 ### Outputs
 
 No output.
+
 <!-- END OF AUTO-GENERATED DOCS USING terraform-docs -->
