@@ -170,6 +170,15 @@ $ gcloud compute backend-services update <NAME> --security-policy atlantis-polic
 * [network](https://registry.terraform.io/modules/terraform-google-modules/network/google/)
 * [cloud-nat](ttps://registry.terraform.io/modules/terraform-google-modules/cloud-nat/google/)
 
+## Known issues
+If Atlantis has full disk, the following error might occur:
+```
+creating new workspace: mkdir /atlantis/repos/statisticsnorway/platform/1814: no space left on device
+```
+A solution for this is to remove any active locks and then delete the plugin cache located at `/atlantis/plugin-cache`
+
+A feature request for automatic plugin cache clean up has been issued: https://github.com/runatlantis/atlantis/issues/916
+
 ## Contributing
 
 We welcome contributions to this setup! Please fork the repo, create a PR and we'll have a look at it. Please remember that changes to this setup should be reflected in the `example` directory and this README.
