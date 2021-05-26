@@ -72,6 +72,7 @@ module "private-cluster" {
   master_authorized_networks         = var.master_authorized_networks
   remove_default_node_pool           = true
   network_policy                     = false
+  release_channel                    = "STABLE"
 
   node_pools = [
     {
