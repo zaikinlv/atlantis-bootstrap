@@ -29,7 +29,7 @@ spec:
             path: atlantis-app-key.pem
       containers:
       - name: atlantis
-        image: runatlantis/atlantis:v0.15.0 # 1. Replace <VERSION> with the most recent release.
+        image: ghcr.io/runatlantis/atlantis:v0.17.4 # 1. Replace <VERSION> with the most recent release.
         env:
         - name: ATLANTIS_REPO_WHITELIST
           value: github.com/<github organization>/<repo name> # 2. Replace this with your own repo whitelist. https://www.runatlantis.io/docs/server-configuration.html#flags
