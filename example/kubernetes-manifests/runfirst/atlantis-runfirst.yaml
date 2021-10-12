@@ -11,13 +11,13 @@ spec:
       - name: atlantis
       containers:
       - $setElementOrder/env:
-        - name: ATLANTIS_REPO_WHITELIST
+        - name: ATLANTIS_REPO_ALLOWLIST
         - name: ATLANTIS_GH_USER
         - name: ATLANTIS_GH_TOKEN
         - name: ATLANTIS_PORT
         - name: ATLANTIS_ATLANTIS_URL
         env:
-        - name: ATLANTIS_REPO_WHITELIST
+        - name: ATLANTIS_REPO_ALLOWLIST
           value: github.com/org/repo # Update me
         - name: ATLANTIS_ATLANTIS_URL
           value: https://atlantis-test.example.com # Update me
