@@ -82,6 +82,7 @@ module "ingress" {
 
   project_id        = module.gcp.project_id
   project_id_prefix = var.project_id_prefix
+  external_ip_name  = var.external_ip_name
   zone_name         = var.zone_name
   resource_group    = var.resource_group
 }

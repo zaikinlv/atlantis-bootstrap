@@ -6,7 +6,7 @@ module "address-fe" {
   source     = "terraform-google-modules/address/google"
   version    = "~> 2.0"
   project_id = var.project_id
-  names      = ["atlantis-external-facing-ip"]
+  names      = [var.external_ip_name]
   global     = true
   region     = var.region
 }

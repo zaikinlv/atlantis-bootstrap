@@ -25,3 +25,8 @@ variable "resource_group" {
   type        = string
   description = "Azure resource group name"
 }
+
+variable "external_ip_name" {
+  type        = string
+  description = "Name of the external IP address resource in GCP"
+}
