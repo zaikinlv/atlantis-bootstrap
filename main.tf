@@ -34,7 +34,7 @@ provider "azurerm" {
 #------------------#
 # GitHub providers #
 #------------------#
-provider github {
+provider "github" {
   version = "2.9.2"
 }
 
@@ -48,13 +48,13 @@ data "google_client_config" "default" {
 provider "kubernetes" {
   load_config_file = false
 
-  host  = "https://${module.gke.endpoint}"
-  token = data.google_client_config.default.access_token
+  host                   = "https://${module.gke.endpoint}"
+  token                  = data.google_client_config.default.access_token
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
 
-module gcp {
+module "gcp" {
   source = "./modules/gcp"
 
   project_name      = var.project_name
@@ -66,7 +66,7 @@ module gcp {
 }
 
 
-module gke {
+module "gke" {
   source = "./modules/gke"
 
   project_id                 = module.gcp.project_id
@@ -77,17 +77,18 @@ module gke {
 }
 
 
-module ingress {
+module "ingress" {
   source = "./modules/ingress"
 
   project_id        = module.gcp.project_id
   project_id_prefix = var.project_id_prefix
+  external_ip_name  = var.external_ip_name
   zone_name         = var.zone_name
   resource_group    = var.resource_group
 }
 
 
-module atlantis {
+module "atlantis" {
   source = "./modules/atlantis"
 
   project_id                 = module.gcp.project_id

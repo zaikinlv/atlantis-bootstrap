@@ -56,8 +56,8 @@ module "cloud-nat" {
 # Create a private Kubernetes cluster #
 #-------------------------------------#
 module "private-cluster" {
-  source                             = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
-  version                            = "~> 11.0"
+  source  = "terraform-google-modules/kubernetes-engine/google//modules/beta-private-cluster"
+  version = "~> 11.0"
 
   project_id                         = var.project_id
   name                               = var.project_id_prefix
