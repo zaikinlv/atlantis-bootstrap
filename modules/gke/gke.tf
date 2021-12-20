@@ -42,7 +42,7 @@ module "vpc" {
 #------------------#
 module "cloud-nat" {
   source  = "terraform-google-modules/cloud-nat/google"
-  version = "~> 1.3"
+  version = "1.3"
 
   project_id    = var.project_id
   region        = var.region
