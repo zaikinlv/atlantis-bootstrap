@@ -6,7 +6,6 @@
 provider "google" {
   # Terraform will check the `GOOGLE_APPLICATION_CREDENTIALS` variable, so no `credentials`
   # value is needed here.
-  version = "~> 3.27.0"
 }
 
 
@@ -15,7 +14,6 @@ provider "google" {
 #-----------------#
 
 provider "azurerm" {
-  version = "~> 2.21.0"
   features {}
 
   subscription_id = var.azure_subscription_id
@@ -35,7 +33,6 @@ provider "azurerm" {
 # GitHub providers #
 #------------------#
 provider "github" {
-  version = "2.9.2"
 }
 
 
