@@ -96,7 +96,7 @@ $ gcloud init
 $ gcloud container clusters get-credentials <CLUSTER NAME> --project <PROJECT ID> --region <REGION>
 
 # Install cert-manager. Check for latest version
-$ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.16.1/cert-manager.yaml
+$ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.yaml
 
 # Create TLS certificate
 $ kubectl apply -k kubernetes-manifests/cert-manager
