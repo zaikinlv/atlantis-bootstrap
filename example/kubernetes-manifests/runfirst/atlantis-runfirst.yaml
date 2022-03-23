@@ -7,19 +7,11 @@ metadata:
 spec:
   template:
     spec:
-      $setElementOrder/containers:
-      - name: atlantis
       containers:
-      - $setElementOrder/env:
-        - name: ATLANTIS_REPO_ALLOWLIST
-        - name: ATLANTIS_GH_USER
-        - name: ATLANTIS_GH_TOKEN
-        - name: ATLANTIS_PORT
-        - name: ATLANTIS_ATLANTIS_URL
-        env:
+      - env:
         - name: ATLANTIS_REPO_ALLOWLIST
           value: github.com/org/repo # Update me
         - name: ATLANTIS_ATLANTIS_URL
           value: https://atlantis-test.example.com # Update me
-        image: runatlantis/atlantis:v0.15.0 # update me
+        image: runatlantis/atlantis:v0.18.2 # Update to latest
         name: atlantis

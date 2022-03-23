@@ -1,6 +1,5 @@
 module "atlantis-test" {
-  #  source = "github-com/statisticsnorway/atlantis-bootstrap"
-  source = "github.com/statisticsnorway/atlantis-bootstrap"
+  source = "github.com/statisticsnorway/atlantis-bootstrap?ref=v3.0.0"
 
   org_id            = "123456789123"         # GCP organization ID
   zone_name         = "example.com"          # DNS zone name in Azure
@@ -22,4 +21,5 @@ module "atlantis-test" {
   azure_subscription_id = var.azure_subscription_id
   azure_tenant_id       = var.azure_tenant_id
   azure_client_id       = var.azure_client_id
+  external_ip_name      = "atlantis-external-facing-ip"
 }
