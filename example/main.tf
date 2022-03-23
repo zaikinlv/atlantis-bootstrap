@@ -1,6 +1,5 @@
 module "atlantis-test" {
-  #  source = "github-com/statisticsnorway/atlantis-bootstrap"
-  source = "github.com/statisticsnorway/atlantis-bootstrap"
+  source = "github.com/statisticsnorway/atlantis-bootstrap?ref=v3.0.0"
 
   org_id            = "123456789123"         # GCP organization ID
   zone_name         = "example.com"          # DNS zone name in Azure
