@@ -11,7 +11,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.8.0"
+      version = "1.13.0"
     }
     github = {
       source  = "hashicorp/github"
