@@ -17,7 +17,15 @@ variable "org_id" {
 
 variable "activate_apis" {
   type        = list(string)
-  default     = ["container.googleapis.com", "iam.googleapis.com", "admin.googleapis.com", "compute.googleapis.com", "secretmanager.googleapis.com", "iap.googleapis.com"]
+  default     = [
+    "container.googleapis.com",
+    "iam.googleapis.com",
+    "admin.googleapis.com",
+    "compute.googleapis.com",
+    "secretmanager.googleapis.com",
+    "iap.googleapis.com",
+    "cloudkms.googleapis.com"
+  ]
   description = "The list of apis to activate within the project"
 }
 
