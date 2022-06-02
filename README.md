@@ -194,33 +194,40 @@ terraform-docs markdown . --indent 3
 <!-- BEGINNING OF AUTO-GENERATED DOCS USING terraform-docs -->
 ### Requirements
 
-| Name | Version |
-|------|---------|
-| terraform | >= 0.13 |
-| azurerm | ~> 2.21.0 |
-| github | 2.9.2 |
-| google | ~> 3.27.0 |
+No requirements.
 
 ### Providers
 
 | Name | Version |
 |------|---------|
-| google | ~> 3.27.0 |
+| google | n/a |
+
+### Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| atlantis | ./modules/atlantis | n/a |
+| gcp | ./modules/gcp | n/a |
+| gke | ./modules/gke | n/a |
+| ingress | ./modules/ingress | n/a |
+
+### Resources
+
+| Name | Type |
+|------|------|
+| [google_client_config.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
 
 ### Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| azure\_client\_id | Azure client ID | `string` | n/a | yes |
-| azure\_client\_secret | Azure client secret | `string` | n/a | yes |
-| azure\_subscription\_id | Azure subscription ID | `string` | n/a | yes |
-| azure\_tenant\_id | Azure tenant ID | `string` | n/a | yes |
 | billing\_account | Billing account ID | `string` | n/a | yes |
+| external\_ip\_name | Name of the external IP address resource in GCP | `string` | n/a | yes |
 | folder\_id | The ID of a folder to host this project | `string` | `""` | no |
 | labels | Labels to use on the project | `map(string)` | `{}` | no |
 | master\_authorized\_networks | The list of CIDR blocks of master authorized networks | <pre>list(object({<br>    cidr_block   = string<br>    display_name = string<br>  }))</pre> | n/a | yes |
 | org\_id | Google organization ID | `string` | `""` | no |
-| project\_id\_prefix | Project prefix ID of the Atlantis project. | `string` | `""` | no |
+| project\_id\_prefix | Project prefix ID of the Atlantis project. Also used as cluster name | `string` | `""` | no |
 | project\_name | The name of the GCP project created for Atlantis resources | `string` | n/a | yes |
 | region | Region in which to create the cluster and run Atlantis. | `string` | `"europe-north1"` | no |
 | resource\_group | Azure resource group name | `string` | n/a | yes |
@@ -229,6 +236,5 @@ terraform-docs markdown . --indent 3
 
 ### Outputs
 
-No output.
-
+No outputs.
 <!-- END OF AUTO-GENERATED DOCS USING terraform-docs -->
