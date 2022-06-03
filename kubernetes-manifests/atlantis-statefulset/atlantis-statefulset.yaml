@@ -56,6 +56,8 @@ spec:
           value: https://atlantis-test.example.com  # 4. Update according to your configuration
         - name: ATLANTIS_REPO_CONFIG_JSON
           value: '{"repos":[{"id":"/.*/", "apply_requirements":["approved"]}]}'
+        - name: ATLANTIS_ALLOW_DRAFT_PRS
+          value: "true"
         volumeMounts:
         - name: atlantis-data
           mountPath: /atlantis
