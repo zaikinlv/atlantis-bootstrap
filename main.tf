@@ -1,55 +1,11 @@
-#------------------#
-# Google Providers #
-#------------------#
-# `GOOGLE_APPLICATION_CREDENTIALS` must be set in the environment before Terraform is run.
-
-provider "google" {
-  # Terraform will check the `GOOGLE_APPLICATION_CREDENTIALS` variable, so no `credentials`
-  # value is needed here.
-}
-
-
-#-----------------#
-# Azure Providers #
-#-----------------#
-
-provider "azurerm" {
-  features {}
-
-  subscription_id = var.azure_subscription_id
-  client_id       = var.azure_client_id
-  client_secret   = var.azure_client_secret
-  tenant_id       = var.azure_tenant_id
-
-  # Make the AzureRM Provider skip registering any required Resource Providers
-  # The reason we do this is because the client does not have the necessary
-  # privileges to register a resource provider.
-  # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview
-  skip_provider_registration = true
-}
-
-
-#------------------#
-# GitHub providers #
-#------------------#
-provider "github" {
-}
-
-
-#--------------------------------------------------------#
-# Configure Kubernetes provider with OAuth2 access token #
-#--------------------------------------------------------#
 data "google_client_config" "default" {
 }
 
 provider "kubernetes" {
-  load_config_file = false
-
   host                   = "https://${module.gke.endpoint}"
   token                  = data.google_client_config.default.access_token
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
-
 
 module "gcp" {
   source = "./modules/gcp"
@@ -62,7 +18,6 @@ module "gcp" {
   billing_account   = var.billing_account
 }
 
-
 module "gke" {
   source = "./modules/gke"
 
@@ -72,7 +27,6 @@ module "gke" {
   region                     = var.region
   zone                       = var.zone
 }
-
 
 module "ingress" {
   source = "./modules/ingress"
@@ -84,13 +38,10 @@ module "ingress" {
   resource_group    = var.resource_group
 }
 
-
 module "atlantis" {
   source = "./modules/atlantis"
 
   project_id                 = module.gcp.project_id
   cluster_name               = module.gke.name
   master_authorized_networks = var.master_authorized_networks
-
-  depends_on = [module.gke]
 }

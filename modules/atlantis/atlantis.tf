@@ -4,19 +4,18 @@ locals {
 
 data "github_ip_ranges" "gh" {}
 
-
 #-----------------------------------------#
 # Create a Workload Identity for Atlantis #
 #-----------------------------------------#
 module "kubernetes-engine_workload-identity" {
-  source       = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
-  version      = "~> 10.0"
-  cluster_name = var.cluster_name
-  name         = "atlantis"
-  namespace    = "default"
-  project_id   = var.project_id
+  source          = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
+  version         = "~> 21.0"
+  cluster_name    = var.cluster_name
+  name            = "atlantis"
+  namespace       = "default"
+  project_id      = var.project_id
+  annotate_k8s_sa = true
 }
-
 
 #--------------------------------------------------------#
 # Create Cloud Armor Security Policy to protect Atlantis #

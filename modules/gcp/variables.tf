@@ -37,9 +37,3 @@ variable "billing_account" {
   type        = string
   description = "Billing account ID"
 }
-
-variable "skip_gcloud_download" {
-  type        = bool
-  default     = true
-  description = "Whether to skip downloading gcloud (assumes gcloud is already available outside the module)"
-}
