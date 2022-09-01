@@ -16,6 +16,7 @@ module "gcp" {
   folder_id         = var.folder_id
   labels            = var.labels
   billing_account   = var.billing_account
+  activate_apis     = var.activate_apis
 }
 
 module "gke" {

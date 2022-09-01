@@ -10,6 +10,20 @@ variable "project_name" {
   description = "The name of the GCP project created for Atlantis resources"
 }
 
+variable "activate_apis" {
+  type        = list(string)
+  default     = [
+    "container.googleapis.com",
+    "iam.googleapis.com",
+    "admin.googleapis.com",
+    "compute.googleapis.com",
+    "secretmanager.googleapis.com",
+    "iap.googleapis.com",
+    "cloudkms.googleapis.com"
+  ]
+  description = "The list of apis to activate within the project"
+}
+
 variable "billing_account" {
   type        = string
   description = "Billing account ID"

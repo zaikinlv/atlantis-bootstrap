@@ -200,16 +200,16 @@ No requirements.
 
 | Name | Version |
 |------|---------|
-| google | n/a |
+| <a name="provider_google"></a> [google](#provider\_google) | n/a |
 
 ### Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| atlantis | ./modules/atlantis | n/a |
-| gcp | ./modules/gcp | n/a |
-| gke | ./modules/gke | n/a |
-| ingress | ./modules/ingress | n/a |
+| <a name="module_atlantis"></a> [atlantis](#module\_atlantis) | ./modules/atlantis | n/a |
+| <a name="module_gcp"></a> [gcp](#module\_gcp) | ./modules/gcp | n/a |
+| <a name="module_gke"></a> [gke](#module\_gke) | ./modules/gke | n/a |
+| <a name="module_ingress"></a> [ingress](#module\_ingress) | ./modules/ingress | n/a |
 
 ### Resources
 
@@ -221,18 +221,19 @@ No requirements.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| billing\_account | Billing account ID | `string` | n/a | yes |
-| external\_ip\_name | Name of the external IP address resource in GCP | `string` | n/a | yes |
-| folder\_id | The ID of a folder to host this project | `string` | `""` | no |
-| labels | Labels to use on the project | `map(string)` | `{}` | no |
-| master\_authorized\_networks | The list of CIDR blocks of master authorized networks | <pre>list(object({<br>    cidr_block   = string<br>    display_name = string<br>  }))</pre> | n/a | yes |
-| org\_id | Google organization ID | `string` | `""` | no |
-| project\_id\_prefix | Project prefix ID of the Atlantis project. Also used as cluster name | `string` | `""` | no |
-| project\_name | The name of the GCP project created for Atlantis resources | `string` | n/a | yes |
-| region | Region in which to create the cluster and run Atlantis. | `string` | `"europe-north1"` | no |
-| resource\_group | Azure resource group name | `string` | n/a | yes |
-| zone | GCP zone in which to create the cluster and run Atlantis | `string` | `"europe-north1-a"` | no |
-| zone\_name | DNS zone name | `string` | n/a | yes |
+| <a name="input_activate_apis"></a> [activate\_apis](#input\_activate\_apis) | The list of apis to activate within the project | `list(string)` | <pre>[<br>  "container.googleapis.com",<br>  "iam.googleapis.com",<br>  "admin.googleapis.com",<br>  "compute.googleapis.com",<br>  "secretmanager.googleapis.com",<br>  "iap.googleapis.com",<br>  "cloudkms.googleapis.com"<br>]</pre> | no |
+| <a name="input_billing_account"></a> [billing\_account](#input\_billing\_account) | Billing account ID | `string` | n/a | yes |
+| <a name="input_external_ip_name"></a> [external\_ip\_name](#input\_external\_ip\_name) | Name of the external IP address resource in GCP | `string` | n/a | yes |
+| <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | The ID of a folder to host this project | `string` | `""` | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | Labels to use on the project | `map(string)` | `{}` | no |
+| <a name="input_master_authorized_networks"></a> [master\_authorized\_networks](#input\_master\_authorized\_networks) | The list of CIDR blocks of master authorized networks | <pre>list(object({<br>    cidr_block   = string<br>    display_name = string<br>  }))</pre> | n/a | yes |
+| <a name="input_org_id"></a> [org\_id](#input\_org\_id) | Google organization ID | `string` | `""` | no |
+| <a name="input_project_id_prefix"></a> [project\_id\_prefix](#input\_project\_id\_prefix) | Project prefix ID of the Atlantis project. Also used as cluster name | `string` | `""` | no |
+| <a name="input_project_name"></a> [project\_name](#input\_project\_name) | The name of the GCP project created for Atlantis resources | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | Region in which to create the cluster and run Atlantis. | `string` | `"europe-north1"` | no |
+| <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | Azure resource group name | `string` | n/a | yes |
+| <a name="input_zone"></a> [zone](#input\_zone) | GCP zone in which to create the cluster and run Atlantis | `string` | `"europe-north1-a"` | no |
+| <a name="input_zone_name"></a> [zone\_name](#input\_zone\_name) | DNS zone name | `string` | n/a | yes |
 
 ### Outputs
 
